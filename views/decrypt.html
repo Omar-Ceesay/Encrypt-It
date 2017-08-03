@@ -86,7 +86,6 @@
 
       function decrypt(data) {
         var key = document.getElementById('password').value;
-        console.log(data.toString("utf8"));
 
         try{
           fs.readFile(data, function(err, data){
