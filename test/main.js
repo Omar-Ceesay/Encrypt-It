@@ -21,7 +21,7 @@ var encrypt = function (file, password){
 }
 
 var decrypt = function(file, ext, password){
-  const decipher = crypto.createDecipher('aes128', password);
+  const decipher = crypto.createDecipher('aes192', password);
 
   extOfFile = path.extname(file);
 

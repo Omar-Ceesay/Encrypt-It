@@ -1,0 +1,23 @@
+#content-editor{
+  width: 50%;
+  height: 100%;
+}
+.filesToBeEncrypted{
+  margin-top: 10px;
+}
+#inputData{
+  float: left;
+  width: 50%;
+  height: 300px;
+}
+#outputData{
+  float: right;
+  width: 50%;
+  height: 300px;
+}
+.decryptTextareas{
+  align-items: center;
+}
+#dataBoxes{
+  margin: 5px 0px;
+}

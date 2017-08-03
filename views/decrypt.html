@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../assets/main.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="jumbotron">
+      <h1>Decrypt It!</h1>
+      <p></p>
+    </div>
+    <div class="container decryptTextareas col-md-12">
+      <div class="alert alert-danger" id="messageWarning" style="display:none;">
+        <strong>Incorrect password!</strong> Make sure the password is entered correctly (password is case-sensitive).
+      </div>
+      <div class="col-md-6">
+
+        <input type="text" placeholder="Encryption password" id="password" class="input-lg"/>
+
+      </div>
+      <div class="col-md-6">
+
+        <button type="button" class="btn btn-primary" id="select-file">Add File</button>
+        <input style="width:60%;" type="text" placeholder="Please select a file" id="actual-file" disabled="disabled"/>
+
+      </div>
+      <div class="col-md-12" id="dataBoxes">
+
+        <textarea rows="8" cols="50" id="inputData"></textarea>
+        <textarea rows="8" cols="50" id="outputData"></textarea>
+
+      </div>
+      <br/>
+      <div class="col-md-12">
+        <a href="../index.html" class="btn btn-primary">Go Back</a>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      const crypto = require('crypto');
+      const fs = require("fs");
+      const {dialog} = require('electron').remote;
+
+      var key = "";
+
+      document.getElementById('select-file').addEventListener('click',function(){
+        dialog.showOpenDialog(function (fileNames) {
+          if(fileNames === undefined){
+            console.log("No file selected");
+          }else{
+            document.getElementById("actual-file").value = fileNames[0];
+            decrypt(fileNames[0]);
+          }
+        });
+      },false);
+
+      document.ondragover = document.ondrop = (ev) => {
+        ev.preventDefault();
+      }
+
+      document.body.ondrop = (ev) => {
+        document.getElementById("outputData").value = "";
+        document.getElementById("messageWarning").style.display = "none";
+        decrypt(ev.dataTransfer.files[0].path);
+
+        ev.preventDefault();
+      }
+
+      document.getElementById('password').addEventListener('input', function(){
+      });
+
+      function decrypt(data) {
+        var key = document.getElementById('password').value;
+        console.log(data.toString("utf8"));
+
+        try{
+          fs.readFile(data, function(err, data){
+            const decipher = crypto.createDecipher('aes192', key);
+            try{
+
+              let unencrypted = decipher.update(data.toString("utf8"), 'hex', 'utf8');
+              unencrypted += decipher.final('utf8');
+              document.getElementById("inputData").value = data.toString("utf8");
+              document.getElementById("outputData").value = unencrypted;
+
+            }catch(e){
+              if(e == "TypeError: Bad input string" || e == "Error: error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt"){
+                document.getElementById("messageWarning").style.display = "";
+              }else{
+                alert(e);
+              }
+            }
+          })
+
+        }catch(e){
+          alert(e);
+        }
+      }
+
+      document.getElementById('inputData').addEventListener('input', function(){
+        var encryptedData = document.getElementById('inputData').value;
+      });
+    </script>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>

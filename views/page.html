@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../assets/main.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <h1>Encrypter</h1>
+    <div style="text-align:center;" class="container">
+      <input style="width:100%;" type="text" placeholder="Please select a file" id="actual-file" disabled="disabled"/>
+      <input type="button" value="Choose a file" id="select-file"/><br/><br/>
+      <input style="width:100%;" type="text" placeholder="Where you want the encrypted files to go" id="pathToFiles"/>
+      <input type="button" value="Choose a path" id="path-file"/><br/><br/>
+      <input type="text" placeholder="Encryption password" id="password"/><br/>
+      <input type="button" value="Encrypt-It!" id="encrypt"/>
+    </div>
+    <div class="jumbotron" id="done" style="display:none;">
+      <h1>Done!</h1>
+      <p></p>
+    </div>
+
+    <div class="container filesToBeEncrypted">
+      <textarea id="content-editor" rows="5"></textarea><br><br>
+
+    </div>
+    <a href="../index.html" class="btn btn-primary">Go Back</a>
+
+    <script>
+      const {dialog} = require('electron').remote; // Load remote compnent that contains the dialog dependency
+      var fs = require('fs');
+      var dir = require('node-dir');
+      var mkdirp = require('mkdirp');
+      var path = require('path');
+
+      document.getElementById('select-file').addEventListener('click',function(){
+        dialog.showOpenDialog({properties: ['openDirectory']}, function (fileNames) {
+          if(fileNames === undefined){
+            console.log("No file selected");
+          }else{
+            document.getElementById("actual-file").value = fileNames[0];
+            displayFiles(fileNames[0]);
+          }
+        });
+      },false);
+
+      document.getElementById('path-file').addEventListener('click',function(){
+        dialog.showOpenDialog({properties: ['openDirectory']}, function (fileNames) {
+          if(fileNames === undefined){
+            console.log("No path selected");
+          }else{
+            document.getElementById("pathToFiles").value = fileNames[0];
+          }
+        });
+      },false);
+
+      document.getElementById('encrypt').addEventListener('click',function(){
+        if (document.getElementById("password").value == "" || document.getElementById("password").value == null) {
+          console.log("Pick a password");
+        }else {
+
+          encrypt_it(
+            document.getElementById("actual-file").value,
+            document.getElementById("pathToFiles").value,
+            document.getElementById("password").value
+          );
+        }
+      },false);
+
+
+      // let myNotification = new Notification('Title', {
+      //   body: 'Lorem Ipsum Dolor Sit Amet'
+      // })
+      // myNotification.onclick = () => {
+      //   document.getElementById("content-editor").value = "Ouch";
+      // }
+
+      function displayFiles(path) {
+        var dir = require('node-dir');
+
+        dir.files(path, function(err, files){
+
+          query = ["node_modules"];
+
+          files = files.filter(function(el) {
+            return el.indexOf(query) === -1;
+          })
+
+          files.forEach(function(item){
+            var li = document.createElement('li');
+            li.textContent = item;
+
+            document.body.appendChild(li);
+          })
+        });
+      }
+
+
+      function encrypt_it(dirToEncrypt, whereToPutFiles, password) {
+        var crypto = require('crypto');
+
+        var pathToEncryptedFiles = whereToPutFiles;
+
+        dir.files(dirToEncrypt, function(err, files){
+
+
+          query = ["node_modules"];
+
+          files = files.filter(function(el) {
+            return el.indexOf(query) === -1;
+          })
+
+          files.forEach(function(item){
+            var basename = "\\" + path.basename(item);
+
+            var dirToCreate = path.dirname(item).substr(dirToEncrypt.length);
+            fs.stat(pathToEncryptedFiles+ "\\encryptedFiles" +dirToCreate, function (err, stats){
+              if (err) {
+                // Directory doesn't exist or something.
+                mkdirp.sync(pathToEncryptedFiles+ "\\encryptedFiles" +dirToCreate, "0777");
+
+                fs.readFile(item, function(err, data){
+                  var cipher = crypto.createCipher('aes192', password);
+
+                  var output = pathToEncryptedFiles+ "\\encryptedFiles" + dirToCreate + basename;
+                  let encrypted = cipher.update(data.toString("utf8"), 'utf8', 'hex');
+                  encrypted += cipher.final('hex');
+
+                  fs.writeFile(output, encrypted, function(err){
+                    if (err) throw err;
+                  })
+                })
+
+              }
+
+            });
+          });
+          alert("Finished!");
+
+        });
+      }
+
+    </script>
+    <!-- <script src="../js/history.js"></script> -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>

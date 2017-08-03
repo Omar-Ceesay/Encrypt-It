@@ -2,16 +2,25 @@
   "name": "encrypt-it",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron index.js"
+    "start": "electron index.js",
+    "package": "asar pack Encrypt-It-win32-x64/resources/app /Encrypt-It-win32-x64/resources/app.asar",
+    "build": "electron-packager . Encrypt-It --icon=favicon.ico",
+    "forcebuild": "electron-packager . Encrypt-It --overwrite"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "electron": "^1.6.11",
+    "asar": "^0.13.0",
     "mkdirp": "^0.5.1",
-    "node-dir": "^0.1.17"
+    "node-dir": "0.1.16",
+    "temp": "^0.8.3"
+  },
+  "devDependencies": {
+    "asar": "^0.13.0",
+    "electron": "^1.6.11",
+    "electron-packager": "^8.7.2"
   }
 }

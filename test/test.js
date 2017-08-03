@@ -9,36 +9,51 @@ var emitter = new EventEmitter();
 
 emitter.setMaxListeners(25);
 
-var dirToEncrypt = "C:/Users/A0C6H1/git/node-auth-signup";
-var dirToEncryptLong = "C:\\Users\\A0C6H1\\git\\node-auth-signup";
-var pathToEncryptedFiles = "C:\\Users\\A0C6H1\\git\\Encrypt-It\\test"
+function encrypt_it(dirToEncrypt, whereToPutFiles, password) {
+  var pathToEncryptedFiles = __dirname;
 
-dir.files(dirToEncrypt, function(err, files){
+  dir.files(dirToEncrypt, function(err, files){
 
-  var cipher = crypto.createCipher('aes128', "password");
 
-  query = ["node_modules"];
+    query = ["node_modules"];
 
-  files = files.filter(function(el) {
-            return el.indexOf(query) === -1;
+    files = files.filter(function(el) {
+      return el.indexOf(query) === -1;
+    })
+
+    files.forEach(function(item){
+      var basename = "\\" + path.basename(item);
+
+      var dirToCreate = path.dirname(item).substr(dirToEncrypt.length);
+      fs.stat(pathToEncryptedFiles+ "\\encryptedFiles" +dirToCreate, function (err, stats){
+        if (err) {
+          // Directory doesn't exist or something.
+          mkdirp.sync(pathToEncryptedFiles+ "\\encryptedFiles" +dirToCreate, "0777");
+
+          fs.readFile(item, function(err, data){
+            var cipher = crypto.createCipher('aes128', "test");
+            console.log("data:: ", data);
+            var output = pathToEncryptedFiles+ "\\encryptedFiles" + dirToCreate + basename;
+
+
+            let encrypted = cipher.update(data, 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+            fs.writeFile(output, encrypted, function(err){
+              if (err) throw err;
+            })
           })
 
-  files.forEach(function(item){
-    var basename = "\\" + path.basename(item);
+          // input.on('end', () => {
+          //   // do stuff
+          //   output.end();
+          //   console.log(pathToEncryptedFiles+ "\\encryptedFiles" + dirToCreate + basename);
+          // });
 
-    var dirToCreate = path.dirname(item).substr(dirToEncrypt.length);
-    fs.stat(pathToEncryptedFiles+ "\\encryptedFiles" +dirToCreate, function (err, stats){
-      if (err) {
-        // Directory doesn't exist or something.
-        mkdirp.sync(pathToEncryptedFiles+ "\\encryptedFiles" +dirToCreate, "0777");
+        }
 
-        var input = fs.createReadStream(item);
-        var output = fs.createWriteStream(pathToEncryptedFiles+ "\\encryptedFiles" + dirToCreate + basename);
-        input.pipe(cipher).pipe(output);
-
-      }
-
+      });
     });
-  });
 
-});
+  });
+}
+encrypt_it("C:/Users/A0C6H1/git/node-auth-signup", '', '');
