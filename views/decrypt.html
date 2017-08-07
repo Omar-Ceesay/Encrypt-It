@@ -20,13 +20,15 @@
     <![endif]-->
   </head>
   <body>
+    <div class="loading" id="loader" style="display:none;">Loading&#8230;</div>
     <div class="jumbotron">
       <h1>Decrypt It!</h1>
       <p></p>
     </div>
     <div class="container decryptTextareas col-md-12">
       <div class="alert alert-danger" id="messageWarning" style="display:none;">
-        <strong>Incorrect password!</strong> Make sure the password is entered correctly (password is case-sensitive).
+        <strong id="strongWarning" style=""></strong>
+        <p id="mainWarning"></p>
       </div>
       <div class="col-md-6">
 
@@ -47,7 +49,7 @@
       </div>
       <br/>
       <div class="col-md-12">
-        <a href="../index.html" class="btn btn-primary">Go Back</a>
+        <a href="../index.html" class="btn btn-primary" id="test">Go Back</a>
       </div>
     </div>
 
@@ -75,7 +77,7 @@
 
       document.body.ondrop = (ev) => {
         document.getElementById("outputData").value = "";
-        document.getElementById("messageWarning").style.display = "none";
+        document.getElementById("loader").style.display = "";
         decrypt(ev.dataTransfer.files[0].path);
 
         ev.preventDefault();
@@ -85,23 +87,55 @@
       });
 
       function decrypt(data) {
+
+        function base64_encode(binaryData) {
+          // convert binary data to base64 encoded string
+          return new Buffer(binaryData).toString('base64');
+        }
+
+        var path = require("path");
         var key = document.getElementById('password').value;
 
         try{
-          fs.readFile(data, function(err, data){
+          fs.readFile(data, function(err, fileData){
             const decipher = crypto.createDecipher('aes192', key);
             try{
 
-              let unencrypted = decipher.update(data.toString("utf8"), 'hex', 'utf8');
+              document.getElementById("inputData").value = fileData.toString("utf8");
+              let unencrypted = decipher.update(fileData.toString("utf8"), 'hex', 'utf8');
               unencrypted += decipher.final('utf8');
-              document.getElementById("inputData").value = data.toString("utf8");
+
+              if (path.extname(data).toLowerCase() == ".jpg" || path.extname(data) == ".png") {
+                var img = document.createElement("img");
+                fs.writeFileSync("./test.jpg", unencrypted);
+
+                var base64str = base64_encode(unencrypted);
+
+                img.src = "data:image/jpg;base64,"+base64str;
+                console.log(img.src);
+                document.getElementById("test").appendChild(img);
+              }
+
+              document.getElementById("loader").style.display = "none";
+              document.getElementById("messageWarning").style.display = "none";
               document.getElementById("outputData").value = unencrypted;
 
             }catch(e){
-              if(e == "TypeError: Bad input string" || e == "Error: error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt"){
+              document.getElementById("loader").style.display = "none";
+              error = {
+                badDecrypt: "Error: error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt",
+                badInputString: "TypeError: Bad input string",
+                wrongBlockLength: "Error: error:0606506D:digital envelope routines:EVP_DecryptFinal_ex:wrong final block length"
+              }
+              console.log(e);
+              if(e == error.badDecrypt){
                 document.getElementById("messageWarning").style.display = "";
-              }else{
-                alert(e);
+                document.getElementById("strongWarning").textContent = "Incorrect password!";
+                document.getElementById("mainWarning").textContent = "Make sure the password is entered correctly (password is case-sensitive).";
+              }else if(e == error.badInputString || e == error.wrongBlockLength){
+                document.getElementById("messageWarning").style.display = "";
+                document.getElementById("strongWarning").textContent = "Bad file!";
+                document.getElementById("mainWarning").textContent = "Something is wrong with the file you inputed. Is it even an encrypted file? Maybe it's the wrong encryption type.";
               }
             }
           })
