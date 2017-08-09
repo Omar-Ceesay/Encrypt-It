@@ -13,7 +13,7 @@ const mainParams = {
   width: 1000,
   height: 800,
   icon : "favicon.ico"
-}
+};
 
 app.on("ready", () => {
   let win = new BrowserWindow(mainParams);
@@ -31,20 +31,20 @@ app.on("ready", () => {
     path = undefined;
   `);
 
-  let tray = null
+  let tray = null;
 
-  tray = new Tray('favicon.ico')
+  tray = new Tray('favicon.ico');
   const contextMenu = Menu.buildFromTemplate([
     {label: 'Item1', type: 'radio'},
     {label: 'Item2', type: 'radio'},
     {label: 'Item3', type: 'radio', checked: true},
     {label: 'Item4', type: 'radio'}
-  ])
-  tray.setToolTip('Encrypt-It!')
-  tray.setContextMenu(contextMenu)
-})
+  ]);
+  tray.setToolTip('Encrypt-It!');
+  tray.setContextMenu(contextMenu);
+});
 
 exports.openWindow = (filename) => {
   let win = new BrowserWindow(mainParams);
   win.loadURL(`file://${__dirname}/views/${filename}`);
-}
+};

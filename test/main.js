@@ -9,7 +9,7 @@ const rl = readline.createInterface({
 });
 
 var encrypt = function (file, password){
-  const cipher = crypto.createCipher('aes128', password);
+  const cipher = crypto.createCipher('aes192', password);
 
   extOfFile = path.extname(file);
 

@@ -15,6 +15,9 @@
   width: 50%;
   height: 300px;
 }
+#encryptionPassword{
+  text-align: center;
+}
 .decryptTextareas{
   align-items: center;
 }
@@ -140,4 +143,106 @@
     -o-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+/* Bubbles */
+/*body {
+  background: #34495e;
+}*/
+
+.bubbleLoader {
+  margin-top: 35px;
+}
+
+.bubble {
+  animation: expand .75s ease-in-out infinite;
+  border-radius: 20px;
+  display: inline-block;
+  transform-origin: center center;
+  margin: 0 3px;
+  width: 20px;
+  height: 20px;
+}
+
+.bubble:nth-child(1) {
+  background: #27ae60;
+}
+
+.bubble:nth-child(2) {
+  animation-delay: 180ms;
+  background: #f1c40f;
+}
+
+.bubble:nth-child(3) {
+  animation-delay: 360ms;
+  background: #e67e22;
+}
+
+.bubble:nth-child(4) {
+  animation-delay: 540ms;
+  background: #2980b9;
+}
+
+@keyframes expand {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.55);
+  }
+}
+/* Nice looking lists */
+
+#listOfFiles {
+  width: 100%;
+}
+
+h2 {
+  font: 400 40px/1.5 Helvetica, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li:last-child {
+  border: none;
+}
+
+li {
+  cursor: pointer;
+  font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
+  border-bottom: 1px solid #ccc;
+  text-decoration: none;
+  color: #000;
+  display: block;
+  width: 100%;
+  padding: 0 6px;
+
+  -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+  transition: font-size 0.3s ease, background-color 0.3s ease;
+}
+
+li:hover {
+  font-size: 22px;
+  color: #darkgrey;
+  background: #f6f6f6;
+}
+li.active {
+  font-size: 22px;
+  color: #darkgrey;
+  background: #f6f6f6;
+}
+#filesAfterQuery textarea {
+  width: 100%;
+  display: none;
+  height: 300px;
+  font-size: 16px;
 }

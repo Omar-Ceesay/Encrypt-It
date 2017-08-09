@@ -19,7 +19,7 @@ function encrypt_it(dirToEncrypt, whereToPutFiles, password) {
 
     files = files.filter(function(el) {
       return el.indexOf(query) === -1;
-    })
+    });
 
     files.forEach(function(item){
       var basename = "\\" + path.basename(item);
@@ -40,8 +40,8 @@ function encrypt_it(dirToEncrypt, whereToPutFiles, password) {
             encrypted += cipher.final('hex');
             fs.writeFile(output, encrypted, function(err){
               if (err) throw err;
-            })
-          })
+            });
+          });
 
           // input.on('end', () => {
           //   // do stuff

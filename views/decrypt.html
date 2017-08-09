@@ -53,106 +53,14 @@
       </div>
     </div>
 
-    <script type="text/javascript">
-      const crypto = require('crypto');
-      const fs = require("fs");
-      const {dialog} = require('electron').remote;
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
-      var key = "";
-
-      document.getElementById('select-file').addEventListener('click',function(){
-        dialog.showOpenDialog(function (fileNames) {
-          if(fileNames === undefined){
-            console.log("No file selected");
-          }else{
-            document.getElementById("actual-file").value = fileNames[0];
-            decrypt(fileNames[0]);
-          }
-        });
-      },false);
-
-      document.ondragover = document.ondrop = (ev) => {
-        ev.preventDefault();
-      }
-
-      document.body.ondrop = (ev) => {
-        document.getElementById("outputData").value = "";
-        document.getElementById("loader").style.display = "";
-        decrypt(ev.dataTransfer.files[0].path);
-
-        ev.preventDefault();
-      }
-
-      document.getElementById('password').addEventListener('input', function(){
-      });
-
-      function decrypt(data) {
-
-        function base64_encode(binaryData) {
-          // convert binary data to base64 encoded string
-          return new Buffer(binaryData).toString('base64');
-        }
-
-        var path = require("path");
-        var key = document.getElementById('password').value;
-
-        try{
-          fs.readFile(data, function(err, fileData){
-            const decipher = crypto.createDecipher('aes192', key);
-            try{
-
-              document.getElementById("inputData").value = fileData.toString("utf8");
-              let unencrypted = decipher.update(fileData.toString("utf8"), 'hex', 'utf8');
-              unencrypted += decipher.final('utf8');
-
-              if (path.extname(data).toLowerCase() == ".jpg" || path.extname(data) == ".png") {
-                var img = document.createElement("img");
-                fs.writeFileSync("./test.jpg", unencrypted);
-
-                var base64str = base64_encode(unencrypted);
-
-                img.src = "data:image/jpg;base64,"+base64str;
-                console.log(img.src);
-                document.getElementById("test").appendChild(img);
-              }
-
-              document.getElementById("loader").style.display = "none";
-              document.getElementById("messageWarning").style.display = "none";
-              document.getElementById("outputData").value = unencrypted;
-
-            }catch(e){
-              document.getElementById("loader").style.display = "none";
-              error = {
-                badDecrypt: "Error: error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt",
-                badInputString: "TypeError: Bad input string",
-                wrongBlockLength: "Error: error:0606506D:digital envelope routines:EVP_DecryptFinal_ex:wrong final block length"
-              }
-              console.log(e);
-              if(e == error.badDecrypt){
-                document.getElementById("messageWarning").style.display = "";
-                document.getElementById("strongWarning").textContent = "Incorrect password!";
-                document.getElementById("mainWarning").textContent = "Make sure the password is entered correctly (password is case-sensitive).";
-              }else if(e == error.badInputString || e == error.wrongBlockLength){
-                document.getElementById("messageWarning").style.display = "";
-                document.getElementById("strongWarning").textContent = "Bad file!";
-                document.getElementById("mainWarning").textContent = "Something is wrong with the file you inputed. Is it even an encrypted file? Maybe it's the wrong encryption type.";
-              }
-            }
-          })
-
-        }catch(e){
-          alert(e);
-        }
-      }
-
-      document.getElementById('inputData').addEventListener('input', function(){
-        var encryptedData = document.getElementById('inputData').value;
-      });
-    </script>
-
+    <script src="../assets/jquery-3.2.1.min.js"></script>
+    <script src="../libs/decrypt.js"></script>
+    <!-- <script src="../js/history.js"></script> -->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-  </body>
+
+    <script>if (window.module) module = window.module;</script>  </body>
 </html>
